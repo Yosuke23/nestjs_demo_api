@@ -10,3 +10,33 @@ services:
       - type: bind
         source: .
         target: /api
+    depends_on:
+      - db
+
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    container_name: nestjs-demo-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nestjs_demo
+      MYSQL_PASSWORD: root
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      #- ./docker/db/data:/var/lib/mysql
+      #- ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    container_name: nestjs-demo-phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=nestjs-demo-db
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    ports:
+      - 8080:80
